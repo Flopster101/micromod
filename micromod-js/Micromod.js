@@ -322,8 +322,17 @@ function Channel( module, id ) {
 
 	this.resample = function( outBuf, offset, count, sampleRate, interpolate ) {
 		if( ampl <= 0 ) return;
-		var lGain = ampl * panning / 32768;
-		var rGain = ampl * ( 255 - panning ) / 32768;
+		var pan = panning;
+		var sep = module.stereoSeparation;
+		if( sep == undefined ) sep = 1.0;
+		if( sep < 0 ) sep = 0;
+		if( sep > 1 ) sep = 1;
+		/* Reduce stereo separation by blending pan toward center. */
+		pan = 128 + ( pan - 128 ) * sep;
+		if( pan < 0 ) pan = 0;
+		if( pan > 255 ) pan = 255;
+		var lGain = ampl * ( 255 - pan ) / 32768;
+		var rGain = ampl * pan / 32768;
 		var samIdx = sampleIdx;
 		var step = freq / sampleRate;
 		var ins = module.instruments[ instrument ];
@@ -594,6 +603,7 @@ function Instrument() {
 
 function Module( module ) {
 	this.songName = "Blank";
+	this.stereoSeparation = 0.5;
 	this.numChannels = 4;
 	this.numInstruments = 1;
 	this.numPatterns = 1;
