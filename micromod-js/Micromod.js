@@ -195,7 +195,8 @@ function Micromod( module, samplingRate ) {
 		}
 		if( breakSeqPos >= 0 ) {
 			if( breakSeqPos >= module.sequenceLength ) {
-				breakSeqPos = nextRow = 0;
+				breakSeqPos = module.restartPos;
+				nextRow = 0;
 			}
 			if( breakSeqPos <= seqPos ) {
 				songEnd = true;
